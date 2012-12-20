@@ -86,7 +86,8 @@ public class Deploy extends Task implements FilenameFilter {
     throws Exception {
     File root = new File(htdocs);
     if (!root.exists()) {
-      throw new Exception("buildpath root directory doesn't exist");
+      throw new Exception("buildpath root directory doesn't exist " +
+        "using path " + htdocs);
     }
     if (app == BuildApp.BUNDLES) {
       File lib =
@@ -226,12 +227,17 @@ public class Deploy extends Task implements FilenameFilter {
     try {
       String line = null;
       try {
-        rewrite(new File(CONF_DIR));
+        File conf = new File(CONF_DIR);
+        if (!conf.exists()) {
+          conf.mkdirs();
+        }
+        rewrite(conf);
       }
       catch(IOException ioe) {
-        System.out.println("We tried rolling back " + FELIX_PROP_FILE +
-          "(s), but failed, we're going to just stop the whole process " +
-            "until this is fixed");
+        System.out.println("We tried creating conf dir and " +
+          "rolling back " + FELIX_PROP_FILE +
+            "(s), but failed, we're going to just stop the whole process " +
+              "until this is fixed");
         ioe.printStackTrace();
         return;
       }
